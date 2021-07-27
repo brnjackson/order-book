@@ -48,37 +48,64 @@ function reconcileOrder(existingBook, incomingOrder) {
         { let matchingOrder = existingBook.filter(order => order.type === incomingOrder.type)
 
           existingBook.push(incomingOrder)
-          if (currentItem.quantity < incomingOrder) {
-            matchingOrder.push({
-              price: incomingOrder.price,
-              type: incomingOrder.type,
-              quantity: incomingOrder.quantity - currentItem.quantity
-
-            })
-
-            return matchingOrder
-          }
-
-          // incoming order type = sell + quantity = 15 + price = 6150
-          // existing order type = buy + quantity = 10 + price = 6150
-          // type = sell + qty = 12 + price = 5950
-          // update existing order to
-          // type = sell quantity = 5 price = 6150 &  type = sell + qty = 12 + price = 5950
-          // remove existing buy order
-          // updating existingBook to include rem 5 units from sell order
+      
+          return matchingOrder
         }
+
+
+      // incoming order type = sell + quantity = 15 + price = 6150
+      // existing order type = buy + quantity = 10 + price = 6150
+      // type = sell + qty = 12 + price = 5950
+      // update existing order to
+      // type = sell quantity = 5 price = 6150 &  type = sell + qty = 12 + price = 5950
+      // remove existing buy order
+      // updating existingBook to include rem 5 units from sell order
       }
-      if (currentItem.type !== incomingOrder.type && currentItem.price > incomingOrder.price &&
+    }
+    if (currentItem.type !== incomingOrder.type && currentItem.price > incomingOrder.price &&
           currentItem.quantity === incomingOrder.quantity) {
-        let matchingOrder = existingBook.filter(order => order.type !== incomingOrder.type)
+      let matchingOrder = existingBook.filter(order => order.type !== incomingOrder.type)
 
-        return matchingOrder
-      }
+      return matchingOrder
+    }
 
-      // return updated book
+    if (currentItem.type !== incomingOrder.type && currentItem.price === incomingOrder.price) {
+      existingBook.push(incomingOrder)
+      let matchingOrder = existingBook.filter(order => order.type !== incomingOrder.type &&
+            order.type <= incomingOrder.quantity)
+
+      matchingOrder.push(existingBook[2])
+
+      return matchingOrder
+    }
+
+    if (currentItem.type !== incomingOrder.type && currentItem.price === incomingOrder.price &&
+        currentItem.quantity < incomingOrder.quantity) {
+      existingBook.push(incomingOrder)
+      let matchingOrder = existingBook.filter(currentItem)
+
+
+
+      matchingOrder.push({
+        price: incomingOrder.price,
+        type: incomingOrder.type,
+        quantity: incomingOrder.quantity - currentItem.quantity
+      })
+
+      return matchingOrder
+    }
+
+    if (currentItem.type !== incomingOrder.type && currentItem.quantity === incomingOrder.quantity &&
+        currentItem.price < incomingOrder.price) {
+      existingBook.push(incomingOrder)
+
       return existingBook
     }
+
+    // return updated book
+    return existingBook
   }
 }
+
 
 module.exports = reconcileOrder

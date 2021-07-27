@@ -65,7 +65,7 @@ describe('Order Book', () => {
       expect(updatedBook).to.deep.equal([{ type: 'sell', quantity: 12, price: 5950 }, { type: 'sell', quantity: 5, price: 6150 }])
     })
 
-    xit('uses two existing orders to completely fulfill an order, removing the matching orders from the book', () => {
+    it('uses two existing orders to completely fulfill an order, removing the matching orders from the book', () => {
       const existingBook = [{ type: 'buy', quantity: 10, price: 6150 }, { type: 'buy', quantity: 5, price: 6150 }, { type: 'sell', quantity: 12, price: 5950 }]
       const incomingOrder = { type: 'sell', quantity: 15, price: 6150 }
 
@@ -74,7 +74,7 @@ describe('Order Book', () => {
       expect(updatedBook).to.deep.equal([{ type: 'sell', quantity: 12, price: 5950 }])
     })
 
-    xit('uses two existing orders to completely fulfill an order, removing the first matching order from the book and reducing the second', () => {
+    it('uses two existing orders to completely fulfill an order, removing the first matching order from the book and reducing the second', () => {
       const existingBook = [{ type: 'buy', quantity: 10, price: 6150 }, { type: 'buy', quantity: 10, price: 6150 }, { type: 'sell', quantity: 12, price: 6950 }]
       const incomingOrder = { type: 'sell', quantity: 15, price: 6150 }
 
@@ -101,7 +101,7 @@ describe('Order Book', () => {
       expect(updatedBook).to.deep.equal([{ type: 'sell', quantity: 12, price: 6950 }])
     })
 
-    xit('Extra Credit: it does not fulfill a mismatched order when it does not benefit both parties', () => {
+    it('Extra Credit: it does not fulfill a mismatched order when it does not benefit both parties', () => {
       const existingBook = [{ type: 'buy', quantity: 15, price: 5900 }, { type: 'sell', quantity: 12, price: 6950 }]
       const incomingOrder = { type: 'sell', quantity: 15, price: 6000 }
 
