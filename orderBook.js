@@ -1,10 +1,12 @@
 function reconcileOrder(existingBook, incomingOrder) {
   // if the existing book does not contain any data
-  if (existingBook.length <= 0) {
+  if (existingBook.length === 0) {
     // add incoming order to empty book
     existingBook.push(incomingOrder)
 
-    return existingBook }
+    return existingBook
+  }
+  let newArray = []
 
   // run through the items in the existing book
   for (let i = 0; i < existingBook.length; i++) {
@@ -13,99 +15,35 @@ function reconcileOrder(existingBook, incomingOrder) {
 
     // if the order type is the same add it to the existing book
     // if the order type is different also add it
-    if (currentItem.type === incomingOrder.type || currentItem.type !== incomingOrder.type) {
-      existingBook.push(incomingOrder)
+    if (incomingOrder.type !== currentItem.type &&
+      (incomingOrder.price === currentItem.price ||
+      (incomingOrder.type === 'sell' && incomingOrder.price < currentItem.price))) {
+      // order type different and price is same
+      // subtract smaller quantity from both orders
+      let smallerQty =
+        incomingOrder.quantity < currentItem.quantity
+          ? incomingOrder.quantity
+          : currentItem.quantity
 
-      // if the order type and quantity matches remove both matches from existingbook
-      if (currentItem.type !== incomingOrder.type && currentItem.quantity === incomingOrder.quantity) {
-        let matchingOrder = existingBook.filter(order => order.type === incomingOrder.type &&
-          order.quantity !== incomingOrder.quantity)
+      currentItem.quantity = currentItem.quantity - smallerQty
+      incomingOrder.quantity = incomingOrder.quantity - smallerQty
 
-        return matchingOrder
-      }
-      // if orders match and existing qty is greater than the incoming qty
-      if (currentItem.type !== incomingOrder.type && currentItem.quantity > incomingOrder.quantity) {
-        // matchingOrder is the finished filtered array
-        let matchingOrder = existingBook.filter(order => order.type === incomingOrder.type &&
-          order.quantity !== incomingOrder.quantity)
-
-        // add incoming order to updatedBook
-        existingBook.push(incomingOrder)
-
-        // run through the filtered array - check qty. update qty to reflect existing qty subtracted incoming qty
-
-        if (currentItem.quantity > incomingOrder.quantity) {
-          matchingOrder.push({
-            price: incomingOrder.price,
-            type: currentItem.type,
-            quantity: currentItem.quantity - incomingOrder.quantity
-          })
-
-
-          return matchingOrder
-        }
-        if (currentItem.type !== incomingOrder.type && currentItem.price === incomingOrder.price)
-        { let matchingOrder = existingBook.filter(order => order.type === incomingOrder.type)
-
-          existingBook.push(incomingOrder)
-      
-          return matchingOrder
-        }
-
-
-      // incoming order type = sell + quantity = 15 + price = 6150
-      // existing order type = buy + quantity = 10 + price = 6150
-      // type = sell + qty = 12 + price = 5950
-      // update existing order to
-      // type = sell quantity = 5 price = 6150 &  type = sell + qty = 12 + price = 5950
-      // remove existing buy order
-      // updating existingBook to include rem 5 units from sell order
+      if (currentItem.quantity === 0) {
+        existingBook.splice(i, 1)
+        i--
+      } else {
+        newArray.push(currentItem)
+        existingBook.splice(i, 1)
+        i--
       }
     }
-    if (currentItem.type !== incomingOrder.type && currentItem.price > incomingOrder.price &&
-          currentItem.quantity === incomingOrder.quantity) {
-      let matchingOrder = existingBook.filter(order => order.type !== incomingOrder.type)
-
-      return matchingOrder
-    }
-
-    if (currentItem.type !== incomingOrder.type && currentItem.price === incomingOrder.price) {
-      existingBook.push(incomingOrder)
-      let matchingOrder = existingBook.filter(order => order.type !== incomingOrder.type &&
-            order.type <= incomingOrder.quantity)
-
-      matchingOrder.push(existingBook[2])
-
-      return matchingOrder
-    }
-
-    if (currentItem.type !== incomingOrder.type && currentItem.price === incomingOrder.price &&
-        currentItem.quantity < incomingOrder.quantity) {
-      existingBook.push(incomingOrder)
-      let matchingOrder = existingBook.filter(currentItem)
-
-
-
-      matchingOrder.push({
-        price: incomingOrder.price,
-        type: incomingOrder.type,
-        quantity: incomingOrder.quantity - currentItem.quantity
-      })
-
-      return matchingOrder
-    }
-
-    if (currentItem.type !== incomingOrder.type && currentItem.quantity === incomingOrder.quantity &&
-        currentItem.price < incomingOrder.price) {
-      existingBook.push(incomingOrder)
-
-      return existingBook
-    }
-
-    // return updated book
-    return existingBook
   }
-}
+  if (incomingOrder.quantity > 0) {
+    existingBook.push(incomingOrder)
+  }
+  existingBook = existingBook.concat(newArray)
 
+  return existingBook
+}
 
 module.exports = reconcileOrder
